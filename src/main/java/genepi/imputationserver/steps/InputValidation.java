@@ -2,9 +2,7 @@ package genepi.imputationserver.steps;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import cloudgene.sdk.internal.WorkflowContext;
 import cloudgene.sdk.internal.WorkflowStep;
@@ -82,6 +80,12 @@ public class InputValidation extends WorkflowStep {
 		int maxSamples = 0;
 		if (store.getString("samples.max") != null) {
 			maxSamples = Integer.parseInt(store.getString("samples.max"));
+		}
+
+		// Set max number of chunk Snp (used as average across chunks)
+		int maxChunkSnps = 20000;
+		if (store.getString("chunk.snps.max") != null){
+			maxChunkSnps = Integer.parseInt(store.getString("chunk.snps.max"));
 		}
 
 		List<VcfFile> validVcfFiles = new Vector<VcfFile>();
@@ -236,6 +240,24 @@ public class InputValidation extends WorkflowStep {
 
 			if (!phased && (phasing == null || phasing.isEmpty() || phasing.equals("no_phasing"))) {
 				context.error("Your input data is unphased. Please select an algorithm for phasing.");
+				return false;
+			}
+
+			if ((double)noSnps/(double)chunks > (double)maxChunkSnps) {
+				context.error("Your upload data contains " + noSnps + " SNPs in " + chunks + " chunks.\n"
+					+"Input genotypes are expect to come from array genotypes with no more than\n"
+					+ maxChunkSnps + " SNPs expected per chunk.");
+				return false;
+			}
+
+			// Check if more than one copy of a chromosome are uploaded
+			Set<String> uniqueChromosomes = new HashSet<String>(chromosomes);
+			String chromString = String.join(" ", chromosomes);
+
+			if(chromosomes.size() != uniqueChromosomes.size()){
+				context.error("Your upload data contains multiple copies of a single chromosome.\n"
+					+ "Input chromosomes: " + chromString + ".\n"
+					+ "Input jobs can only have one file per chromosome.\n");
 				return false;
 			}
 

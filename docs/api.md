@@ -1,39 +1,21 @@
 # API Reference
 
-The REST APIs provide programmatic ways to submit new jobs and to download data from Michigan Imputation Server. It identifies users using authentication tokens, responses are provided in JSON format.
-
+REST APIs provide programmatic ways to submit new jobs and to download data from both [Michigan Imputation Server](https://imputationserver.sph.umich.edu) and the [TOPMed Imputation Server](https://imputation.biodatacatalyst.nhlbi.nih.gov). It identifies users using authentication tokens, responses are provided in JSON format.
 
 ## Authentication
-Michigan Imputation Server uses a token-based authentication. The token is required for all future interaction with the server. The token can be created and downloaded from your user profile (username -> Profile):
+Both Michigan and TOPMed Imputation Server use a token-based authentication mechanism. The token is required for all future interaction with the server. The token can be created and downloaded from your user profile (username -> Profile):
 
 ![Activate API](https://raw.githubusercontent.com/genepi/imputationserver-docker/master/images/api.png)
 
-For security reasons, Api Tokens are valid for 30 days. You can check the status in the web interface.
+_**Note:** the tokens from Michigan Imputation Server and TOPMed Imputation Server are unique to each server_
 
+## Job Submission
+The API allows setting several imputation parameters.
 
-## Job Submission for Whole Genome Imputation
-The API allows to submit imputation jobs and to set several parameters. For HLA imputation, please see below. 
+### Michigan Imputation Server Job Submission
 
-### POST /jobs/submit/minimac4
-
-The following parameters can be set:
-
-| Parameter        | Values           | Default Value  |  Required  |
-| ------------- |:-------------| :-----|---|
-| files         | /path/to/file |  | **x** |
-| mode          | `qconly`<br> `phasing` <br> `imputation`     | `imputation`   | |
-| password      | user-defined password      |  auto generated and send by mail  | |
-| files-source  | `file-upload`<br> `sftp`<br> `http`     |  `file-upload`  | |
-| refpanel      | `hrc-r1.1` <br> `1000g-phase-3-v5` <br>  `gasp-v2` <br>  `genome-asia-panel`  <br> `1000g-phase-1` <br> `cappa` <br> `hapmap-2` | - | **x** |
-| phasing     | `eagle`<br> `no_phasing`      |  `eagle`  | |
-| population  | `eur`<br> `afr`<br> `asn`<br> `amr`<br> `sas`<br> `eas`<br> `AA`<br> `mixed` <br> `all`   |  -  | **x** |
-| build       | `hg19`<br> `hg38` | `hg19`  | |
-| r2Filter    | `0` <br> `0.001` <br> `0.1` <br> `0.2` <br> `0.3` | `0`  | |
-
-## Job Submission for HLA Imputation
-The API also allows to submit imputation jobs using the HLA application. Please note, that the population parameter can be skipped here. 
-
-### POST /jobs/submit/imputationserver-hla
+URL: https://imputationserver.sph.umich.edu/api/v2
+POST /jobs/submit/minimac4
 
 The following parameters can be set:
 
@@ -43,11 +25,31 @@ The following parameters can be set:
 | mode          | `qconly`<br> `phasing` <br> `imputation`     | `imputation`   | |
 | password      | user-defined password      |  auto generated and send by mail  | |
 | files-source  | `file-upload`<br> `sftp`<br> `http`     |  `file-upload`  | |
-| refpanel      | `multiethnic-hla-panel-Ggroup` <br>  `multiethnic-hla-panel-4digit` | - | **x** |
+| refpanel      | `apps@hapmap-2`<br> `apps@hrc-r1.1`<br> `apps@1000g-phase-1`<br> `apps@1000g-phase-3-v5` <br> `apps@genome-asia-panel@1.0.0` <br> `apps@cappa` | - | **x** |
 | phasing     | `eagle`<br> `no_phasing`      |  `eagle`  | |
+| population  | `eur`<br> `afr`<br> `asn`<br> `amr`<br> `sas`<br> `eas`<br> `AA`<br> `mixed`      |  -  | **x** |
 | build       | `hg19`<br> `hg38` | `hg19`  | |
 | r2Filter    | `0` <br> `0.001` <br> `0.1` <br> `0.2` <br> `0.3` | `0`  | |
 
+### TOPMed Imputation Server Job Submission
+
+URL: https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2
+POST /jobs/submit/imputationserver@1.2.7
+
+The following parameters can be set:
+
+| Parameter        | Values           | Default Value  |
+| ------------- |:-------------| :-----|
+| input-files      | /path/to/file |  |
+| input-mode | qconly, imputation     | imputation   |
+| input-password | user-defined password      |  auto  |
+| input-files-source | file-upload, sftp, http     |  default: file-upload  |
+| input-refpanel     | apps@topmed-r2@1.0.0     | - |
+| input-phasing | eagle      |  eagle  |
+| input-population | all, mixed      |  all  |
+
+
+### Examples
 
 ### Examples: curl
 
@@ -64,7 +66,7 @@ TOKEN="YOUR-API-TOKEN";
 curl https://imputationserver.sph.umich.edu/api/v2/jobs/submit/minimac4 \
   -H "X-Auth-Token: $TOKEN" \
   -F "files=@/path-to/file.vcf.gz" \
-  -F "refpanel=1000g-phase-3-v5" \
+  -F "refpanel=apps@1000g-phase-3-v5" \
   -F "population=eur"
 ```
 
@@ -78,7 +80,15 @@ Response:
 }
 ```
 
-#### Submit multiple files
+#### Submit a single file using TOPMed 
+
+To submit a job please change `/path-to-file` to the actual path.
+
+```sh
+curl -H "X-Auth-Token: <your-API-token>" -F "input-files=@/path-to-file" -F "input-refpanel=apps@topmed-r2@1.0.0" -F "input-phasing=eagle" https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2/jobs/submit/imputationserver@1.2.7
+```
+
+#### Submit multiple files using 1000 Genomes Phase 3
 
 Submits multiple vcf files and impute against 1000 Genomes Phase 3 reference panel.
 
@@ -91,7 +101,7 @@ curl https://imputationserver.sph.umich.edu/api/v2/jobs/submit/minimac4 \
   -H "X-Auth-Token: $TOKEN" \
   -F "files=@/path-to/file1.vcf.gz" \
   -F "files=@/path-to/file2.vcf.gz" \
-  -F "refpanel=1000g-phase-3-v5" \
+  -F "refpanel=apps@1000g-phase-3-v5" \
   -F "population=eur"
 ```
 
@@ -119,7 +129,7 @@ curl  https://imputationserver.sph.umich.edu/api/v2/jobs/submit/minimac4 \
   -H "X-Auth-Token: $TOKEN" \
   -F "files=https://imputationserver.sph.umich.edu/static/downloads/hapmap300.chr1.recode.vcf.gz" \
   -F "files-source=http" \
-  -F "refpanel=hrc-r1.1" \
+  -F "refpanel=apps@hrc-r1.1" \
   -F "population=eur" \
   -F "mode=qconly"
 ```
@@ -150,7 +160,7 @@ token = 'YOUR-API-TOKEN';
 # add token to header (see Authentication)
 headers = {'X-Auth-Token' : token }
 data = {
-  'refpanel': '1000g-phase-3-v5',
+  'refpanel': 'apps@1000g-phase-3-v5',
   'population': 'eur'
 }
 
@@ -180,7 +190,7 @@ token = 'YOUR-API-TOKEN';
 # add token to header (see Authentication)
 headers = {'X-Auth-Token' : token }
 data = {
-  'refpanel': '1000g-phase-3-v5',
+  'refpanel': 'apps@1000g-phase-3-v5',
   'population': 'eur'
 }
 
@@ -286,7 +296,7 @@ Response:
 
 ```json
 {
-  "application":"Michigan Imputation Server (Minimac4) 1.5.8",
+  "application":"Michigan Imputation Server (Minimac4) 1.1.4",
   "applicationId":"minimac4",
   "deletedOn":-1,
   "endTime":1462369824173,
