@@ -22,7 +22,6 @@ public class InputValidation extends WorkflowStep {
 
 	@Override
 	public boolean run(WorkflowContext context) {
-		String phasingEngine = context.get("phasing");
 
 		context.log("Versions:");
 		context.log("  Pipeline: " + ImputationPipeline.PIPELINE_VERSION);
@@ -153,7 +152,7 @@ public class InputValidation extends WorkflowStep {
 						context.endTask(
 								"Please double check, if all uploaded VCF files include the same amount of samples ("
 										+ vcfFile.getNoSamples() + " vs " + noSamples + ")",
-										WorkflowContext.ERROR);
+								WorkflowContext.ERROR);
 						return false;
 					}
 
@@ -189,23 +188,32 @@ public class InputValidation extends WorkflowStep {
 
 					if (build.equals("hg19") && vcfFile.hasChrPrefix()) {
 						context.endTask("Your upload data contains chromosome '" + vcfFile.getRawChromosome()
-						+ "'. This is not a valid hg19 encoding. Please ensure that your input data is build hg19 and chromosome is encoded as '"
-						+ vcfFile.getChromosome() + "'.", WorkflowContext.ERROR);
+								+ "'. This is not a valid hg19 encoding. Please ensure that your input data is build hg19 and chromosome is encoded as '"
+								+ vcfFile.getChromosome() + "'.", WorkflowContext.ERROR);
 						return false;
 					}
 
 					if (build.equals("hg38") && !vcfFile.hasChrPrefix()) {
 						context.endTask("Your upload data contains chromosome '" + vcfFile.getRawChromosome()
-						+ "'. This is not a valid hg38 encoding. Please ensure that your input data is build hg38 and chromosome is encoded as 'chr"
-						+ vcfFile.getChromosome() + "'.", WorkflowContext.ERROR);
+								+ "'. This is not a valid hg38 encoding. Please ensure that your input data is build hg38 and chromosome is encoded as 'chr"
+								+ vcfFile.getChromosome() + "'.", WorkflowContext.ERROR);
 						return false;
+					}
+
+					if (pgsPanel != null) {
+						if (!panel.getBuild().equals(pgsPanel.getBuild())) {
+							context.endTask(
+									"The build version of the selected reference panel (" + panel.getBuild()  +  ") and scores (" + pgsPanel.getBuild() + ") does not match.",
+									WorkflowContext.ERROR);
+							return false;
+						}
 					}
 
 					infos = "Samples: " + noSamples + "\n" + "Chromosomes:" + chromosomeString + "\n" + "SNPs: "
 							+ noSnps + "\n" + "Chunks: " + chunks + "\n" + "Datatype: "
 							+ (phased ? "phased" : "unphased") + "\n" + "Build: " + (build == null ? "hg19" : build)
 							+ "\n" + "Reference Panel: " + reference + " (" + panel.getBuild() + ")" + "\n"
-							+ "Population: " + population + "\n" + "Phasing: eagle" + "\n" + "Mode: " + mode
+							+ "Population: " + population + "\n" + "Phasing: " + phasing + "\n" + "Mode: " + mode
 							+ (pgsPanel != null ? "\n" + "PGS-Calculation: " + pgsPanel.getScores().size() + " scores"
 									: "");
 
