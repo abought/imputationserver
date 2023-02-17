@@ -15,6 +15,7 @@ import genepi.imputationserver.steps.vcf.VcfChunkOutput;
 import genepi.io.FileUtil;
 import genepi.riskscore.io.Chunk;
 import genepi.riskscore.io.PGSCatalog;
+import genepi.riskscore.io.formats.RiskScoreFormatFactory.RiskScoreFormat;
 import genepi.riskscore.tasks.ApplyScoreTask;
 import groovy.text.SimpleTemplateEngine;
 import htsjdk.samtools.util.StopWatch;
@@ -23,7 +24,7 @@ import lukfor.progress.tasks.Task;
 
 public class ImputationPipeline {
 
-	public static final String PIPELINE_VERSION = "michigan-imputationserver-1.6.6";
+	public static final String PIPELINE_VERSION = "michigan-imputationserver-1.7.1";
 
 	public static final String IMPUTATION_VERSION = "minimac4-1.0.2";
 
@@ -344,6 +345,18 @@ public class ImputationPipeline {
 			task.setVcfFilename(output.getImputedVcfFilename());
 			task.setChunk(scoreChunk);
 			task.setRiskScoreFilenames(scores);
+			
+			//TODO: enable fix-strand-flips
+			//task.setFixStrandFlips(true);
+			//task.setRemoveAmbiguous(true);
+			
+			for (String file : scores) {
+				String autoFormat = file + ".format";
+				if (new File(autoFormat).exists()) {
+					task.setRiskScoreFormat(file, RiskScoreFormat.MAPPING_FILE);
+				}
+			}
+
 			task.setOutputReportFilename(output.getScoreFilename() + ".json");
 			task.setOutput(output.getScoreFilename());
 

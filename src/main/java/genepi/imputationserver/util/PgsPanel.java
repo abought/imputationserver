@@ -12,6 +12,8 @@ public class PgsPanel {
 
 	private String build = "";
 
+	private String meta = null;
+
 	private List<String> scores = new Vector<>();
 
 	private PgsPanel() {
@@ -28,6 +30,9 @@ public class PgsPanel {
 			}
 			if (map.containsKey("build")) {
 				panel.build = map.get("build").toString();
+			}
+			if (map.containsKey("meta")) {
+				panel.meta = map.get("meta").toString();
 			}
 			if (map.containsKey("scores")) {
 				List<String> list = (List<String>) map.get("scores");
@@ -56,6 +61,14 @@ public class PgsPanel {
 
 	public String getBuild() {
 		return build;
+	}
+
+	public String getMeta() {
+		return meta;
+	}
+
+	public void setMeta(String meta) {
+		this.meta = meta;
 	}
 
 }
