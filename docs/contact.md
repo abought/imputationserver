@@ -2,23 +2,15 @@
 
 The complete Imputation Server source code is available on [GitHub](https://github.com/genepi/imputationserver). Feel free to create issues and pull requests. Before contacting us, please have a look at the [FAQ page](/faq) first. 
 
-Please contact [Michigan Imputation Server](mailto:imputationserver@umich.edu) in case of other problems.
+Please contact the [helpdesk](mailto:imputationserver@umich.edu) in case of other questions or issues.
 
 ## TOPMed Imputation Server Team
 
 [TOPMed Imputation Server](https://imputation.biodatacatalyst.nhlbi.nih.gov) provides free genotype imputation for the TOPMed reference panel. You can upload phased or unphased GWAS agenotypes and receive phased and imputed genomes in return. For uploaded data sets an extensive QC is performed.
 
+* [Helpdesk](mailto:imputationserver@umich.edu) (**use this address for all inquiries**)
 * [Albert Smith](mailto:albertvs@umich.edu)
-* [Jacob Pleiness](mailto:pleiness@umich.edu)
-
-## Michigan Imputation Server Team
-
-[Michigan Imputation Server](https://imputationserver.sph.umich.edu) provides a free genotype imputation service using Minimac4, supporting imputation 1000 Genome and Haplotype Reference Consortium Panels . You can upload phased or unphased GWAS genotypes and receive phased and imputed genomes in return. For all uploaded data sets an extensive QC is performed.
-
-* [Christian Fuchsberger](mailto:cfuchsb@umich.edu)
-* [Lukas Forer](mailto:lukas.forer@i-med.ac.at)
-* [Sebastian Schönherr](mailto:sebastian.schoenherr@i-med.ac.at)
-* [Sayantan Das](mailto:sayantan@umich.edu)
+* [Andrew Boughton](mailto:abought@umich.edu)
 * [Gonçalo Abecasis](mailto:goncalo@umich.edu)
 
 

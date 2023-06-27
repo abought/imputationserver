@@ -1,14 +1,17 @@
 # Data preparation
 
-Michigan Imputation Server accepts VCF files compressed with [bgzip](http://samtools.sourceforge.net/tabix.shtml). Please make sure the following requirements are met:
+TOPMed Imputation Server accepts VCF files compressed with [bgzip](http://samtools.sourceforge.net/tabix.shtml). Please make sure the following requirements are met:
 
 - Create a separate vcf.gz file for each chromosome.
 - Variations must be sorted by genomic position.
 - GRCh37 or GRCh38 coordinates are required.
+  - If your input data is GRCh37/hg19, please ensure chromosomes are encoded without prefix (e.g. 20).
+  - If your input data is GRCh38/hg38, please ensure chromosomes are encoded with prefix 'chr' (e.g. chr20). 
 - VCF files need to be version 4.2 (or lower)
+- Due to server resource requirements, there is a maximum of 25k samples per chromosome per job (and a minimum of 20 samples). Please see the FAQ for details. 
 
 !!! note
-    Several \*.vcf.gz files can be uploaded at once.
+    Multiple \*.vcf.gz files (one per chromosome) can be uploaded as part of a single job.
 
 
 

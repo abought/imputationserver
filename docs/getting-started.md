@@ -10,9 +10,9 @@ Please cite this paper if you use the Imputation Server in your GWAS study:
 > Das S, Forer L, Schönherr S, Sidore C, Locke AE, Kwong A, Vrieze S, Chew EY, Levy S, McGue M, Schlessinger D, Stambolian D, Loh PR, Iacono WG, Swaroop A, Scott LJ, Cucca F, Kronenberg F, Boehnke M, Abecasis GR, Fuchsberger C. [Next-generation genotype imputation service and methods](https://www.ncbi.nlm.nih.gov/pubmed/27571263). Nature Genetics 48, 1284–1287 (2016).
 
 
-## Setup your first imputation job
+## Set up your first imputation job
 
-Please [login](https://imputation.biodatacatalyst.nhlbi.nih.gov/index.html#!pages/login) with your credentials and click on the **Run** tab to start a new imputation job. The submission dialog allows you to specify the properties of your imputation job.
+Please [log in](https://imputation.biodatacatalyst.nhlbi.nih.gov/index.html#!pages/login) with your credentials and click on the **Run** tab to start a new imputation job. The submission dialog allows you to specify the properties of your imputation job.
 
 ![](images/submit-job01.png)
 
@@ -26,24 +26,15 @@ The TOPMed Imputation Server offers genotype imputation for the TOPMed reference
 
 - TOPMed (Version r2 2020)
 
+See the [reference panels documentation](/reference-panels) for details.
+
 #### Michigan Imputation Server
 
-The Michigan Imputation Server has several additional reference panels available.  Please select one that fulfills your needs and supports the population of your input data:
-
-- HRC (Version r1.1 2016)
-- HLA Imputation Panel: two-field (four-digit) and G-group resolution
-- HRC (Version r1 2015)
-- 1000 Genomes Phase 3 (Version 5)
-- 1000 Genomes Phase 1 (Version 3)
-- CAAPA - African American Panel
-- HapMap 2
-- TOPMed Freeze5 (in preparation)
-
-More details about all available reference panels can be found [here](/reference-panels/).
+The Michigan Imputation Server is a separate service with several additional reference panels available.  Consult the relevant [documentation](https://imputationserver.readthedocs.io/en/latest/reference-panels/) for details.
 
 ### Upload VCF files from your computer
 
-When using the file upload, data is uploaded from your local file system to Michigan Imputation Server. By clicking on **Select Files** an open dialog appears where you can select your VCF files:
+When using the file upload, data is uploaded from your local file system to the TOPMed Imputation Server. By clicking on **Select Files** an open dialog appears where you can select your VCF files:
 
 ![](images/upload-data01.png)
 
@@ -59,10 +50,10 @@ Please make sure that all files fulfill the [requirements](/prepare-your-data).
     Since version 1.7.2 URL-based uploads (sftp and http) are no longer supported. Please use direct file uploads instead. 
 
 ### Build
-Please select the build of your data. Currently the options **hg19** and **hg38** are supported. Michigan Imputation Server automatically updates the genome positions (liftOver) of your data. All reference panels except TOPMed are based on hg19 coordinates.
+Please select the build of your data. Currently, the options **hg19** and **hg38** are supported. The TOPMed Imputation Server automatically updates the genome positions of your data (liftOver). The TOPMed reference panel is based on hg38 coordinates.
 
 ### rsq Filter
-To minimize the file size, Michigan Imputation Server includes a r<sup>2</sup> filter option, excluding all imputed SNPs with a r<sup>2</sup>-value (= imputation quality) smaller then the specified value.
+To minimize the file size, the Imputation Server includes a r<sup>2</sup> filter option, excluding all imputed SNPs with a r<sup>2</sup>-value (= imputation quality) smaller than the specified value.
 
 ### Phasing
 
@@ -74,20 +65,9 @@ If your uploaded data is *unphased*, Eagle v2.4 will be used for phasing. In cas
 
 ### Population
 
-Please select the population of your uploaded samples. This information is used to compare the allele frequencies between your data and the reference panel. Please note that not every reference panel supports all sub-populations.
+Please select whether to compare allele frequencies between your data and the reference panel. Please note that not every reference panel supports all sub-populations.
 
-|  Population | Supported Reference Panels |
-| ----------- | ---------------------------|
-| **AFR** | all except TOPMed-r2 |
-| **AMR** | all except TOPMed-r2 |
-| **EUR** | all except TOPMed-r2 |
-| **Mixed** | all |
-| **AA** | CAAPA |
-| **ASN** | 1000 Genomes Phase 1 (Version 3) |
-| **EAS** | 1000 Genomes Phase 3 (Version 5) |
-| **SAS** | 1000 Genomes Phase 3 (Version 5) |
-
-In case your population is not listed or your samples are from different populations, please select **Mixed** to skip the allele frequency check. For mixed populations, no QC-Report will be created.
+In case your samples are mixed from different populations, please select **Skip** to skip the allele frequency check. For mixed populations, no QC-Report will be created.
 
 ### Mode
 
@@ -96,7 +76,7 @@ Please select if you want to run **Quality Control & Imputation**, **Quality Con
 
 ### AES 256 encryption
 
-All Imputation Server results are encrypted by default. Please tick this checkbox if you want to use AES 256 encryption instead of the default encryption method. Please note that AES encryption does not work with standard unzip programs. We recommend to use 7z instead.
+All Imputation Server results are returned as an encrypted `.zip` file by default. This option enables stronger AES 256 encryption instead of the default encryption method. Please note that AES encryption does not work with standard unzip programs. We recommend [7-zip](https://www.7-zip.org/download.html) instead.
 
 
 ## Start your imputation job
@@ -117,7 +97,7 @@ After Input Validation has finished, basic statistics can be viewed directly in 
 
 ![](images/input-validation02.png)
 
-If you encounter problems with your data please read this tutorial about [Data Preparation](/prepare-your-data) to ensure your data is in the correct format.
+If you encounter problems with your input data, please read this tutorial about [Data Preparation](/prepare-your-data) to ensure your data is in the correct format.
 
 ### Quality Control
 
@@ -130,7 +110,7 @@ In this step we check each variant and exclude it in case of:
 5. allele mismatch between reference panel and uploaded data
 6. SNP call rate < 90%
 
-All filtered variants are listed in a file called `statistics.txt` which can be downloaded by clicking on the provided link. More informations about our QC pipeline can be found [here](/pipeline).
+All filtered variants are listed in a file called `statistics.txt` which can be downloaded by clicking on the provided link. More information about our QC pipeline can be found [here](/pipeline).
 
 ![](images/quality-control02.png)
 
@@ -138,17 +118,17 @@ If you selected a population, we compare the allele frequencies of the uploaded 
 
 ### Pre-phasing and Imputation
 
-Imputation is achieved with Minimac4. The progress of all uploaded chromosomes is updated in real time and visualized with different colors.
+Imputation is performed using Minimac4. The progress of all uploaded chromosomes is updated in real time and visualized with different colors.
 
 ![](images/imputation01.png)
 
 ### Data Compression and Encryption
 
-If imputation was successful, we compress and encrypt your data and send you a random password via mail.
+If imputation was successful, we compress and encrypt your data and send you a random password via e-mail.
 
 ![](images/compression01.png)
 
-This password is not stored on our server at any time. Therefore, if you lost the password, there is no way to resend it to you.
+**This password is not stored on our server** at any time. Therefore, if you lost the password, there is no way to resend it to you, and you will need to re-impute your results.
 
 ## Download results
 
@@ -157,7 +137,7 @@ The user is notified by email, as soon as the imputation job has finished. A zip
 ![](images/job-results.png)
 
 !!! important "All data is deleted automatically after 7 days"
-    Be sure to download all needed data in this time period. We send you a reminder 48 hours before we delete your data. Once your job hast the state **retired**, we are not able to recover your data!
+    Be sure to download all needed data in this time period. We send you a reminder 48 hours before we delete your data. Once your job has the state **retired**, we are not able to recover your data!
 
 
 ###  Download via a web browser
@@ -170,8 +150,7 @@ In order to download results via the commandline using `wget`or `aria2` you need
 
 ![](images/share-data01.png)
 
-A new dialog appears which provides you the private link. Click on the tab **wget command** to get a copy & paste ready command that can be used on Linux or MacOS to download the file in you terminal:
-
+A new dialog appears which provides you the private link. Click on the tab **wget command** to get a copy & paste ready command that can be used on Linux or MacOS to download the file via the command-line.
 
 ### Download all results at once
 
