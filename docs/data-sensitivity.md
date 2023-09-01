@@ -1,13 +1,15 @@
 # Data Security
 
-For TOPMed Imputation, data is transfered to a secure server hosted on Amazon Web Servies, a wide array of security measures are in force:
+For TOPMed Imputation, data is transferred to a secure server hosted on Amazon Web Services. As of May 2023, we have completed a rigorous security review and received a federal Authorization to Operate (ATO) from NIH/NHLBI. A wide array of security measures are in force:
 
-- The complete interaction with the server is secured with HTTPS.
+- All traffic to and from the server is secured with HTTPS.
 - Input data is deleted from our servers as soon it is not needed anymore.
-- We only store the number of samples and markers analyzed, we don't ever "look" at your data in anyway.
-- All results are encrypted with a strong one-time password - thus, only you can read them.
-- After imputation is finished, the data uploader has 7 days to use an encrypted connection to get results back.
-- The complete source code is available in a [public Github repository](https://github.com/genepi/imputationserver/tree/qc-refactoring).
+- We only store the number of samples and markers analyzed. We don't ever "look" at your data in any way.
+- All results are encrypted with a strong one-time password. We do not retain this password: only you can read the results.
+- After imputation is finished, the user has 7 days to download the results, after which they are automatically deleted.
+- The complete source code is available via public Github repositories: 
+  - [Imputation pipeline](https://github.com/statgen/imputationserver/)
+  - [Web application](https://github.com/statgen/cloudgene)
 
 
 ## Who has access?
@@ -20,9 +22,9 @@ To upload and download data, users must register with a unique e-mail address an
 A wide array of security measures are in force on the imputation servers:
 
 -	All stored data is encrypted at rest using FIPS 140-2 validated cryptographic software as well as encrypted in transit.
--	Access controls follow principles of least privilege. All administrative access is secured via two-factor authentication using roll-based access controls and temporary credentials.
+-	Access controls follow the principle of least privilege. All administrative access is secured via two-factor authentication using role-based access controls and temporary credentials.
 -	Network access is restricted and filtered via web application firewalls, network access control lists, and security groups. Public/private network segmentation also ensures only the services that need to be are exposed to the public internet. All internal traffic and requests are logged and scanned for malicious or unusual activity.
--	Advanced DDOS protection is in place to assure consistent site availability.
+-	Advanced DDoS protection is in place to assure consistent site availability.
 -	All administrative user activities, system activities, and network traffic is logged and scanned for anomalies and malicious activity. Findings are alerted to administrative users.
 
 

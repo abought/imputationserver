@@ -14,4 +14,4 @@ The TOPMed panel consists of 194,512 haplotypes
 | Imputation Server: | [https://imputation.biodatacatalyst.nhlbi.nih.gov](https://imputation.biodatacatalyst.nhlbi.nih.gov) |
 | Website: | [https://www.nhlbiwgs.org/](https://www.nhlbiwgs.org/) |
 
-**Additional [reference panels](https://imputationserver.readthedocs.io/en/latest/reference-panels/) are available from the [Michigan Imputation Server](https://imputationserver.sph.umich.edu).**
+**Additional [reference panels](https://imputationserver.readthedocs.io/en/latest/reference-panels/) are available from the [Michigan Imputation Server](https://imputationserver.sph.umich.edu), which is a separate service.**

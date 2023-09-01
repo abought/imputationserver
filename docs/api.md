@@ -3,11 +3,13 @@
 REST APIs provide programmatic ways to submit new jobs and to download data from both [Michigan Imputation Server](https://imputationserver.sph.umich.edu) and the [TOPMed Imputation Server](https://imputation.biodatacatalyst.nhlbi.nih.gov). It identifies users using authentication tokens, responses are provided in JSON format.
 
 ## Authentication
-Both Michigan and TOPMed Imputation Server use a token-based authentication mechanism. The token is required for all future interaction with the server. The token can be created and downloaded from your user profile (username -> Profile):
+The TOPMed Imputation Server uses a token-based authentication mechanism for all automated scripts that use our APIs. The token is required for all future interaction with the server. The token can be created and downloaded from your [user profile](https://imputation.biodatacatalyst.nhlbi.nih.gov/#!pages/profile) (username -> Profile):
 
 ![Activate API](https://raw.githubusercontent.com/genepi/imputationserver-docker/master/images/api.png)
 
-_**Note:** the tokens from Michigan Imputation Server and TOPMed Imputation Server are unique to each server_
+!!! note
+    Tokens will expire after 30 days. **Please keep your token secure** and never commit to a public repository (such as GitHub). We reserve the right to revoke API credentials at any time if an automated script is causing problems.
+
 
 ## Job Submission
 The API allows setting several imputation parameters.
@@ -15,156 +17,113 @@ The API allows setting several imputation parameters.
 ### TOPMed Imputation Server Job Submission
 
 URL: https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2
-POST /jobs/submit/imputationserver@1.7.3
+POST /jobs/submit/imputationserver
 
 The following parameters can be set:
 
-| Parameter      | Values                                            | Default Value  |  Required  |
-| ----------- |:--------------------------------------------------| :-----|---|
-| job-name    | (user specified)                                  |  |  |
-| files       | /path/to/file                                     |  | **x** |
-| mode        | `qconly`<br> `phasing` <br> `imputation`          | `imputation`   | |
-| refpanel    | `apps@topmed-r2@1.0.0`                            | - | **x** |
-| phasing     | `eagle`<br> `no_phasing`                          |  `eagle`  | |
-| build       | `hg19`<br> `hg38`                                 | `hg19`  | |
-| r2Filter    | `0` <br> `0.001` <br> `0.1` <br> `0.2` <br> `0.3` | `0`  | |
+| Parameter     | Values                                            | Default Value | Required |
+|---------------|---------------------------------------------------|---------------|----------|
+| job-name      | (user specified)                                  |               |          |
+| files         | /path/to/file                                     |               | **x**    |
+| mode          | `qconly`<br> `phasing` <br> `imputation`          | `imputation`  | **x**    |
+| refpanel      | `apps@topmed-r2`                                  | -             | **x**    |
+| phasing       | `eagle`<br> `no_phasing`                          | `eagle`       |          |
+| build         | `hg19`<br> `hg38`                                 | `hg19`        |          |
+| r2Filter      | `0` <br> `0.001` <br> `0.1` <br> `0.2` <br> `0.3` | `0`           |          |
+| aesEncryption | `no`<br>`yes`                                     | `no`          |          |
+| meta          | `no`<br>`yes`                                     | `no`          |          |
 
+* The _meta_ option generates a meta-imputation file.
+* AES 256 encryption is stronger than the default option, but `.zip` files using AES 256 cannot be opened with common decompression programs. If you select this option, you will need a tool such as [7-zip](https://www.7-zip.org/download.html) to open your results. 
 
 ### Examples
 
 ### Examples: curl
 
-#### Submit a single file using TOPMed 
+#### Submit file(s) using TOPMed 
 
-To submit a job please change `/path-to-file` to the actual path.
-
-```sh
-curl -H "X-Auth-Token: <your-API-token>" -F "input-files=@/path-to-file" -F "input-refpanel=apps@topmed-r2@1.0.0" -F "input-phasing=eagle" https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2/jobs/submit/imputationserver@1.7.3
-```
-
-#### Submit multiple files using 1000 Genomes Phase 3
-
-Submits multiple vcf files and impute against 1000 Genomes Phase 3 reference panel.
-
-Command:
+To submit a job please change `/path-to-file` to the actual path. This example can be adapted to send one, or multiple, files. (one per chromosome)
 
 ```sh
 TOKEN="YOUR-API-TOKEN";
 
-curl https://imputationserver.sph.umich.edu/api/v2/jobs/submit/minimac4 \
-  -H "X-Auth-Token: $TOKEN" \
-  -F "files=@/path-to/file1.vcf.gz" \
-  -F "files=@/path-to/file2.vcf.gz" \
-  -F "refpanel=apps@1000g-phase-3-v5" \
-  -F "population=eur"
+curl https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2/jobs/submit/imputationserver \
+  -X "POST" \
+  -H "X-Auth-Token: ${TOKEN}" \
+  -F "job-name=Documentation example (1000G - chr1 and 2)" \
+  -F "files=@/path-to/filename_chr1.vcf.gz" \
+  -F "files=@/path-to/filename_chr2.vcf.gz" \
+  -F "refpanel=apps@topmed-r2" \
+  -F "build=hg38" \
+  -F "phasing=eagle" \
+  -F "population=all" \
+  -F "meta=yes"
 ```
+
 
 Response:
 
 ```json
 {
-  "id":"job-20120504-155023",
+  "id":"job-20160101-000001",
   "message":"Your job was successfully added to the job queue.",
   "success":true
 }
 ```
-
-
-#### Submit file from a HTTP(S)
-
-Submits files from https with HRC reference panel and quality control.
-
-Command:
-
-```sh
-TOKEN="YOUR-API-TOKEN";
-
-curl  https://imputationserver.sph.umich.edu/api/v2/jobs/submit/minimac4 \
-  -H "X-Auth-Token: $TOKEN" \
-  -F "files=https://imputationserver.sph.umich.edu/static/downloads/hapmap300.chr1.recode.vcf.gz" \
-  -F "files-source=http" \
-  -F "refpanel=apps@hrc-r1.1" \
-  -F "population=eur" \
-  -F "mode=qconly"
-```
-
-Response:
-
-```json
-{
-  "id":"job-20120504-155023",
-  "message":"Your job was successfully added to the job queue.",
-  "success":true
-}
-```
-
 
 ### Examples: Python
 
-#### Submit single vcf file
+#### Submit one or more vcf files
 
-```python
-import requests
+```python3
 import json
 
-# imputation server url
-url = 'https://imputationserver.sph.umich.edu/api/v2'
-token = 'YOUR-API-TOKEN';
-
-# add token to header (see Authentication)
-headers = {'X-Auth-Token' : token }
-data = {
-  'refpanel': 'apps@1000g-phase-3-v5',
-  'population': 'eur'
-}
-
-# submit new job
-vcf = '/path/to/genome.vcf.gz';
-files = {'files' : open(vcf, 'rb')}
-r = requests.post(url + "/jobs/submit/minimac4", files=files, data=data, headers=headers)
-if r.status_code != 200:
-  print(r.json()['message'])
-  raise Exception('POST /jobs/submit/minimac4 {}'.format(r.status_code))
-
-# print response and job id
-print(r.json()['message'])
-print(r.json()['id'])
-```
-
-#### Submit multiple vcf files
-
-```python
 import requests
-import json
 
 # imputation server url
-url = 'https://imputationserver.sph.umich.edu/api/v2'
+base = 'https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2'
 token = 'YOUR-API-TOKEN';
 
-# add token to header (see Authentication)
+# add token to header (see documentation for Authentication)
 headers = {'X-Auth-Token' : token }
 data = {
-  'refpanel': 'apps@1000g-phase-3-v5',
-  'population': 'eur'
+  'job-name': 'Documentation example (1000G - chr1 and 2)',
+  'refpanel': 'apps@topmed-r2',
+  'population': 'all',
+  'build': 'hg38',
+  'phasing': 'eagle',
+  'r2Filter': 0,
+  'meta': 'yes',
 }
 
-# submit new job
-vcf = '/path/to/file1.vcf.gz';
-vcf1 = '/path/to/file2.vcf.gz';
-files = [('files', open(vcf, 'rb')), ('files', open(vcf1, 'rb'))]
-r = requests.post(url + "/jobs/submit/minimac4", files=files, data=data, headers=headers)
-if r.status_code != 200:
-  print(r.json()['message'])
-  raise Exception('POST /jobs/submit/minimac4 {}'.format(r.status_code))
+# submit new job. This demonstrates multiple files, one per chromosome. Edit to send one or more chromosomes, as needed.
+vcf1 = '/path/to/filename_chr1.vcf.gz';
+vcf2 = '/path/to/filename_chr2.vcf.gz';
 
-# print message
-print(r.json()['message'])
-print(r.json()['id'])
+with open(vcf1, 'rb') as f1, open(vcf2, 'rb') as f2:
+    files = [
+        ('files', f1),
+        ('files', f2)
+    ]
+    
+    endpoint = "/jobs/submit/imputationserver"
+    resp = requests.post(base + endpoint, files=files, data=data, headers=headers)
+
+output = resp.json()
+
+if resp.status_code != 200:
+  print(output['message'])
+  raise Exception('POST {} {}'.format(endpoint, resp.status_code))
+else:
+    # print message
+    print(output['message'])
+    print(output['id'])
 ```
 
 
 ## List all jobs
-All running jobs can be returned as JSON objects at once.
+Return a list of all currently running jobs (for the user associated with the provided token).
+
 ### GET /jobs
 
 ### Examples: curl
@@ -174,100 +133,122 @@ Command:
 ```sh
 TOKEN="YOUR-API-TOKEN";
 
-curl -H "X-Auth-Token: $TOKEN" https://imputationserver.sph.umich.edu/api/v2/jobs
-```
-
-Response:
-
-```json
-[
-  {
-    "applicationId":"minimac",
-    "executionTime":0,
-    "id":"job-20160504-155023",
-    "name":"job-20160504-155023",
-    "positionInQueue":0,
-    "running":false,
-    "state":5
-  },{
-    "applicationId":"minimac",
-    "executionTime":0,
-    "id":"job-20160420-145809",
-    "name":"job-20160420-145809",
-    "positionInQueue":0,
-    "running":false,
-    "state":5
-  },{
-    "applicationId":"minimac",
-    "executionTime":0,
-    "id":"job-20160420-145756",
-    "name":"job-20160420-145756",
-    "positionInQueue":0,
-    "running":false,
-    "state":5
-  }
-]
-```
-
-### Example: Python
-
-```python
-import requests
-import json
-
-# imputation server url
-url = 'https://imputationserver.sph.umich.edu/api/v2'
-token = 'YOUR-API-TOKEN';
-
-# add token to header (see authentication)
-headers = {'X-Auth-Token' : token }
-
-# get all jobs
-r = requests.get(url + "/jobs", headers=headers)
-if r.status_code != 200:
-    raise Exception('GET /jobs/ {}'.format(r.status_code))
-
-# print all jobs
-for job in r.json():
-    print('{} [{}]'.format(job['id'], job['state']))
-```
-
-## Monitor Job Status
-
-### /jobs/{id}/status
-
-### Example: curl
-
-Command:
-
-```sh
-TOKEN="YOUR-API-TOKEN";
-
-curl -H "X-Auth-Token: $TOKEN" https://imputationserver.sph.umich.edu/api/v2/jobs/job-20160504-155023/status
+curl -H "X-Auth-Token: ${TOKEN}" https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2/jobs
 ```
 
 Response:
 
 ```json
 {
-  "application":"Michigan Imputation Server (Minimac4) 1.1.4",
-  "applicationId":"minimac4",
-  "deletedOn":-1,
-  "endTime":1462369824173,
-  "executionTime":0,
-  "id":"job-20160504-155023",
-  "logs":"",
-  "name":"job-20160504-155023",
-  "outputParams":[],
-  "positionInQueue":0,
-  "running":false,
-  "startTime":1462369824173,
-  "state":5
-  ,"steps":[]
+  "count": 1,
+  "page": 1,
+  "pages": [
+    1
+  ],
+  "data": [
+    {
+      "app": null,
+      "application": "Genotype Imputation (Minimac4) 1.7.3",
+      "canceld": false,
+      "complete": true,
+      "currentTime": 1687898833855,
+      "endTime": 0,
+      "finishedOn": 1687898825867,
+      "id": "job-20230627-204701-307",
+      "name": "job-20230627-204701-307",
+      "positionInQueue": -1,
+      "priority": 0,
+      "progress": -1,
+      "setupEndTime": 1687898822002,
+      "setupRunning": false,
+      "setupStartTime": 1687898821563,
+      "startTime": 0,
+      "state": 5,
+      "submittedOn": 1687898821315,
+      "userAgent": "curl/7.87.0",
+      "workspaceSize": ""
+    }
+  ]
+}
+```
+
+### Example: Python
+
+```python
+import json
+
+import requests
+
+# imputation server url
+url = 'https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2'
+token = 'YOUR-API-TOKEN';
+
+# add token to header (see authentication)
+headers = {'X-Auth-Token' : token }
+
+# get all jobs for the user associated with this token
+endpoint = "/jobs"
+resp = requests.get(url + endpoint, headers=headers)
+if resp.status_code != 200:
+    raise Exception('GET {} {}'.format(endpoint, resp.status_code))
+
+# print all jobs
+for job in resp.json()['data']:
+    print('{} [{}]'.format(job['id'], job['state']))
+```
+
+## Monitor Job Status
+
+### /jobs/{id}/status
+This endpoint includes basic information about a job, such as execution status (waiting = 1, running = 2, waiting to export results = 3, success = 4, failed = 5, canceled = 6). See `/jobs/{id}` for another endpoint that provides information about individual step progress, similar to the logs in the UI.
+
+### Example: curl
+
+Substitute your job ID into the examples as requested. This is commonly used to monitor the status of one specific submitted job. To avoid overwhelming the server, we ask that you rate-limit your automated scripts to check no more often than once per minute. (not included in the example below)
+
+Command:
+
+```sh
+TOKEN="YOUR-API-TOKEN";
+
+curl -H "X-Auth-Token: $TOKEN" https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2/jobs/job-20160101-000001/status
+```
+
+Response:
+
+```json
+{
+  "app": null,
+  "application": "Genotype Imputation (Minimac4) 1.7.3",
+  "applicationId": "imputationserver",
+  "canceld": false,
+  "complete": true,
+  "currentTime": 1687898968305,
+  "deletedOn": -1,
+  "endTime": 0,
+  "finishedOn": 1687898825867,
+  "id": "job-20160101-000001",
+  "logs": "",
+  "name": "job-20160101-000001",
+  "outputParams": [],
+  "positionInQueue": -1,
+  "priority": 0,
+  "progress": -1,
+  "running": false,
+  "setupEndTime": 1687898822002,
+  "setupRunning": false,
+  "setupStartTime": 1687898821563,
+  "startTime": 0,
+  "state": 5,
+  "steps": [],
+  "submittedOn": 1687898821315,
+  "workspaceSize": ""
 }
 ```
 
 ## Monitor Job Details
+
+This endpoint includes more specific information about a job and completed steps, similar to what is shown in the website job details page. Generally, this endpoint is less helpful for automated scripts; the information in this endpoint is easier to read from within the website UI.
 
 ### /jobs/{id}
 
@@ -276,5 +257,5 @@ Response:
 ```sh
 TOKEN="YOUR-API-TOKEN";
 
-curl -H "X-Auth-Token: $TOKEN" https://imputationserver.sph.umich.edu/api/v2/jobs/job-20160504-155023/
+curl -H "X-Auth-Token: $TOKEN" https://imputation.biodatacatalyst.nhlbi.nih.gov/api/v2/jobs/job-20160101-000001/
 ```
