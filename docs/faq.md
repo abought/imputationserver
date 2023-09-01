@@ -27,5 +27,5 @@ Your data is available for 7 days. If you need an extension, please [let us know
 ## Can I download all results at once?
 We provide wget command for all results. Please open the results tab. The last column in each row includes direct links to all files.
 
-## My company requires security review to use an external service
+## Is this service secure?
 Due to small team size, it is difficult for us to complete detailed security questionnaires for every company or entity. However, as of May 2023, we have completed a rigorous external security review and received federal Authorization to Operate (ATO) from NHLBI/NIH. Please see our [security](/data-sensitivity) documentation for some common information, or [contact us](/contact) for specific questions. 

@@ -65,7 +65,7 @@ If your uploaded data is *unphased*, Eagle v2.4 will be used for phasing. In cas
 
 ### Population
 
-Please select whether to compare allele frequencies between your data and the reference panel. Please note that not every reference panel supports all sub-populations.
+Please select whether to compare allele frequencies between your data and the reference panel.
 
 In case your samples are mixed from different populations, please select **Skip** to skip the allele frequency check. For mixed populations, no QC-Report will be created.
 
@@ -76,7 +76,7 @@ Please select if you want to run **Quality Control & Imputation**, **Quality Con
 
 ### AES 256 encryption
 
-All Imputation Server results are returned as an encrypted `.zip` file by default. This option enables stronger AES 256 encryption instead of the default encryption method. Please note that AES encryption does not work with standard unzip programs. We recommend [7-zip](https://www.7-zip.org/download.html) instead.
+All Imputation Server results are returned as an encrypted `.zip` file by default. If you select this option, we will use stronger AES 256 encryption instead of the default encryption method. However, note that AES encryption does not work with standard unzip programs. If this option is selected, we recommend using [7-zip](https://www.7-zip.org/download.html) to open your results.
 
 
 ## Start your imputation job
