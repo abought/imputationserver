@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import cloudgene.sdk.internal.WorkflowContext;
 import cloudgene.sdk.internal.WorkflowStep;
 import genepi.hadoop.importer.ImporterFactory;
@@ -122,7 +124,7 @@ public class InputValidation extends WorkflowStep {
 				return false;
 			}
 		} catch (Exception e) {
-			context.error("Unable to parse reference panel '" + reference + "': " + e.getMessage());
+			context.error("Unable to parse reference panel '" + reference + "': " + StringEscapeUtils.escapeHtml(e.getMessage()));
 			return false;
 		}
 
@@ -248,7 +250,7 @@ public class InputValidation extends WorkflowStep {
 
 			} catch (IOException e) {
 
-				context.endTask(e.getMessage() + " (see <a href=\"/start.html#!pages/help\">Help</a>).",
+				context.endTask(StringEscapeUtils.escapeHtml(e.getMessage()) + " (see <a href=\"/start.html#!pages/help\">Help</a>).",
 						WorkflowContext.ERROR);
 				return false;
 
